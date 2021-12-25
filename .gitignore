@@ -1,3 +1,4 @@
 /bscscan-python
 .env
-.csv
+.vscode
+*.csv
