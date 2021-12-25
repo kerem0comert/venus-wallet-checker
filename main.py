@@ -3,7 +3,7 @@ import os
 import csv
 from dotenv import load_dotenv
 from bscscan import BscScan
-from coinmarketcapapi import CoinMarketCapAPI, CoinMarketCapAPIError
+from coinmarketcapapi import CoinMarketCapAPI
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -24,8 +24,8 @@ KEYS = {
     "vBUSD": "0x95c78222b3d6e262426483d42cfa53685a67ab9d",
     "vBNB": "0xa07c5b74c9b40447a954e1466938b865b6bbea36"
 }
-MULTIPLIER = 100000000
 
+MULTIPLIER = 100000000
 
 wallet = [Coin("vBNB",0,0, False), Coin("vUSDT",0,0, True), Coin("vBUSD",0,0, True)]
 
@@ -42,13 +42,13 @@ async def main():
     async with BscScan(KEYS["BSCSCAN_API_KEY"]) as bsc:
         cmc = CoinMarketCapAPI(KEYS["CMC_API_KEY"])
         for coin in wallet:
-            coin.amount = await getAccountAmount(bsc, coin.symbol)
+            coin.amount = await get_account_amount(bsc, coin.symbol)
             r = cmc.tools_priceconversion(symbol=coin.symbol, amount=coin.amount)
             coin.usd_amount = r.data['quote']['USD']['price']
         write_to_excel(wallet)
         print(coin)
         
-async def getAccountAmount(bsc, currency: str):
+async def get_account_amount(bsc, currency: str):
     amount = int(await bsc.get_acc_balance_by_token_contract_address(address=KEYS["ADDRESS"], contract_address=KEYS[currency])) / MULTIPLIER
     print(f"{currency}: {amount}")
     return amount
